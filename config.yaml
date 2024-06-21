@@ -13,8 +13,11 @@ Web:
 
   # Web Information
   Tab_Title: Douyin_TikTok_Download_API    # Web title | Web标题
-  Description: Douyin_TikTok_Download_API is a free open-source API service for Douyin/TikTok. It provides a simple, fast, and stable API for developers to develop applications based on Douyin/TikTok.    # Web description | Web描述
-  Favicon: https://raw.githubusercontent.com/Evil0ctal/Douyin_TikTok_Download_API/main/logo/logo192.png    # Web favicon | Web图标
+  Description: Douyin_TikTok_Download_API is a free open-source API service for Douyin/TikTok.
+    It provides a simple, fast, and stable API for developers to develop applications
+    based on Douyin/TikTok.                                                                                                                                                                                 # Web description | Web描述
+  Favicon: 
+    https://raw.githubusercontent.com/Evil0ctal/Douyin_TikTok_Download_API/main/logo/logo192.png           # Web favicon | Web图标
 
   # Fun Configuration
   Easter_Egg: true    # Enable Easter Egg | 启用彩蛋
@@ -25,7 +28,7 @@ Web:
 API:
   # Network Configuration
   Host_IP: 0.0.0.0    # default IP | 默认IP
-  Host_Port: 80    # default port is 80 | 默认端口为80
+  Host_Port: 81    # default port is 80 | 默认端口为80
   Docs_URL: /docs    # API documentation URL | API文档URL
   Redoc_URL: /redoc    # API documentation URL | API文档URL
 
@@ -38,8 +41,8 @@ API:
   Download_Switch: true    # Enable download function | 启用下载功能
 
   # File Configuration
-  Download_Path: "./download"    # Default download directory | 默认下载目录
-  Download_File_Prefix: "douyin.wtf_"    # Default download file prefix | 默认下载文件前缀
+  Download_Path: ./download      # Default download directory | 默认下载目录
+  Download_File_Prefix: douyin.wtf_      # Default download file prefix | 默认下载文件前缀
 
 
 # iOS Shortcut
