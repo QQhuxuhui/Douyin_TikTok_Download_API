@@ -28,6 +28,12 @@ def get_config_path():
     config_path = os.path.join(project_root, 'config.yaml')
     return config_path
 
+def get_douyun_config_path():
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    config_path = os.path.abspath(os.path.join(script_dir, '../../crawlers/douyin/web'))
+    config_path = os.path.join(config_path, 'config.yaml')
+    return config_path
+
 def main():
     print("开始检测可用端口")
     config_path = get_config_path()
@@ -39,6 +45,18 @@ def main():
     print(f"Found available port: {available_port}")
     update_config_port(available_port, config_path)
     print(f"Updated {config_path} with port {available_port}")
+    
+
+def update_config_cookie(cookie):  
+    config_path = get_douyun_config_path()
+    yaml = YAML()
+    with open(config_path, 'r') as file:
+        config = yaml.load(file)
+    
+    config['TokenManager']['douyin']['headers']['Cookie'] = cookie
+
+    with open(config_path, 'w') as file:
+        yaml.dump(config, file)
 
 if __name__ == "__main__":
     main()
