@@ -1,6 +1,7 @@
 import os
 import socket
 from ruamel.yaml import YAML
+import yaml
 
 def is_port_available(port):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
@@ -28,11 +29,7 @@ def get_config_path():
     config_path = os.path.join(project_root, 'config.yaml')
     return config_path
 
-def get_douyun_config_path():
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    config_path = os.path.abspath(os.path.join(script_dir, '../../crawlers/douyin/web'))
-    config_path = os.path.join(config_path, 'config.yaml')
-    return config_path
+
 
 def main():
     print("开始检测可用端口")
@@ -45,9 +42,17 @@ def main():
     print(f"Found available port: {available_port}")
     update_config_port(available_port, config_path)
     print(f"Updated {config_path} with port {available_port}")
-    
+ 
+# 获取抖音配置文件
+def get_douyun_config_path():
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    config_path = os.path.abspath(os.path.join(script_dir, '../../crawlers/douyin/web'))
+    config_path = os.path.join(config_path, 'config.yaml')
+    return config_path
 
+# 更新抖音cookie
 def update_config_cookie(cookie):  
+    print(cookie)
     config_path = get_douyun_config_path()
     yaml = YAML()
     with open(config_path, 'r') as file:
@@ -58,5 +63,18 @@ def update_config_cookie(cookie):
     with open(config_path, 'w') as file:
         yaml.dump(config, file)
 
+# 获取web地址
+def get_web_ip():
+    with open(get_config_path(), 'r', encoding='utf-8') as file:
+        config = yaml.safe_load(file)
+    return config.get('API', {}).get('Host_IP', None)
+
+# 获取web端口
+def get_web_port():
+    with open(get_config_path(), 'r', encoding='utf-8') as file:
+        config = yaml.safe_load(file)
+    return config.get('API', {}).get('Host_Port', None)
+
+    
 if __name__ == "__main__":
     main()

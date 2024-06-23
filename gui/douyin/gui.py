@@ -4,6 +4,8 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineProfile
 from PyQt5.QtCore import QUrl
 from PyQt5.QtWebEngineCore import QWebEngineCookieStore
 
+import douyin.service as service
+
 class InputDialog(QInputDialog):
     def __init__(self, title, label_text, parent=None):
         super().__init__(parent)
@@ -97,26 +99,26 @@ class MainWindow(QMainWindow):
         title_label.setStyleSheet("font-size: 16px; font-weight: bold;")
 
         # Table 1: 文章信息表格
-        table1 = QTableWidget(5, 7)  # 5行7列
-        table1.setHorizontalHeaderLabels(["序号", "发布时间", "文章标题", "作品链接", "攒点数量", "评论数量", "文章标签"])
+        self.table1 = QTableWidget(5, 7)  # 5行7列
+        self.table1.setHorizontalHeaderLabels(["发布时间","评论ID","用户ID", "用户昵称", "地点", "评论内容", "评论点赞数量", "评论回复数量"])
         for row in range(5):
             for col in range(7):
-                table1.setItem(row, col, QTableWidgetItem(f"Item {row+1}-{col+1}"))
+                self.table1.setItem(row, col, QTableWidgetItem(f"Item {row+1}-{col+1}"))
 
         # Table 2: 评论信息表格
-        table2 = QTableWidget(10, 9)  # 10行9列
-        table2.setHorizontalHeaderLabels(["序号", "昵称", "抖音号", "地址", "评论时间", "评论内容", "点赞数量", "不喜欢数量", "转发数量"])
-        for row in range(10):
-            for col in range(9):
-                table2.setItem(row, col, QTableWidgetItem(f"Item {row+1}-{col+1}"))
+        # self.table2 = QTableWidget(10, 9)  # 10行9列
+        # self.table2.setHorizontalHeaderLabels(["序号", "昵称", "抖音号", "地址", "评论时间", "评论内容", "点赞数量", "不喜欢数量", "转发数量"])
+        # for row in range(10):
+        #     for col in range(9):
+        #         self.table2.setItem(row, col, QTableWidgetItem(f"Item {row+1}-{col+1}"))
 
         # Log text edit
         self.log_text = LogTextEdit()
 
         # Adding to right layout
         right_layout.addWidget(title_label)
-        right_layout.addWidget(table1)
-        right_layout.addWidget(table2)
+        right_layout.addWidget(self.table1)
+        # right_layout.addWidget(self.table2)
         right_layout.addWidget(self.log_text)
 
         # Adding to main layout
@@ -137,10 +139,10 @@ class MainWindow(QMainWindow):
         if not self.cookies:
             self.log_text.append_log("未能获取任何 cookie.")
             return
-
         cookie_list = [f"{name}={value}" for name, value in self.cookies]
         cookie_str = "; ".join(cookie_list)
         self.log_text.append_log(f"获取的 cookie: {cookie_str}")
+        service.set_cookie(cookie_str)
 
     def show_account_works_dialog(self):
         dialog = InputDialog("批量下载账号作品", "请输入账号链接:", self)
@@ -160,6 +162,8 @@ class MainWindow(QMainWindow):
         if dialog.exec_():
             account_link = dialog.textValue()
             self.log_text.append_log(f"开始采集作品评论数据，账号链接为: {account_link}")
+            data = service.fetch_video_comments(account_link)
+            service.update_comments_table(self.table1,data);
 
     def show_collect_search_results_dialog(self):
         dialog = InputDialog("采集搜索结果数据", "请输入筛选条件:", self)
