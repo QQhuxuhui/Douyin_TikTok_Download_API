@@ -7,14 +7,18 @@ from douyin.gui import MainWindow
 import subprocess
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'douyin'))
-from update_config import main as update_config_main
+from config import main as update_config_main
 
 
 def start_uvicorn():
-    subprocess.Popen(['python', 'start.py'])
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    start_path = os.path.abspath(os.path.join(script_dir, '../'))
+    subprocess.Popen(['python', start_path + '/' +  'start.py'])
 
 def main():
     update_config_main()
+    
+    # 启动API服务
     start_uvicorn()
     
     app = QApplication(sys.argv)
