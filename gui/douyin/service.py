@@ -1,8 +1,10 @@
 import requests
 import douyin.config as  config # 导入 update_config 模块
-from PyQt5.QtWidgets import QTableWidgetItem
+from PyQt5.QtWidgets import QTableWidgetItem, QMessageBox
 import json
 import datetime
+import csv
+from PyQt5.QtWidgets import QFileDialog
 
 web_ip = config.get_web_ip()
 web_port = config.get_web_port()
@@ -17,30 +19,30 @@ def set_cookie(cookie):
 
 
 # 获取单个作品的ID
-def get_aweme_id(url):
+def get_aweme_id(log_text, url):
     params = {
         "url": url
     }
     # 发送GET请求
     url = base_url + "/get_aweme_id";
-    print(url)
+    # log_text.append_log(url)
     response = requests.get(url, params=params)
     # 检查响应状态码
     if response.status_code == 200:
         # 解析JSON响应
         data = response.json()
-        print("获取作品ID成功:")
-        print(data)
+        log_text.append_log("获取作品ID成功")
+        # print(data)
         return data.get('data');
     else:
-        print(f"请求失败，状态码: {response.status_code}")
-        print(response.text)
+        log_text.append_log(f"请求失败，状态码: {response.status_code}")
+        # print(response.text)
         return None
         
 
 # 获取单个作品的信息
-def fetch_one_video(url):
-    aweme_id = get_aweme_id(url);
+def fetch_one_video(log_text, url):
+    aweme_id = get_aweme_id(log_text, url);
     if(aweme_id):
         # Query parameters
         params = {
@@ -55,19 +57,19 @@ def fetch_one_video(url):
             data = response.json()
             return data
         else:
-            print(f"请求失败，状态码: {response.status_code}")
-            print(response.text)
+            log_text.append_log(f"请求失败，状态码: {response.status_code}")
+            # print(response.text)
             return None
     else:
-        print("获取作品ID失败")
+        log_text.append_log("获取作品ID失败")
         return None
     
     
 # 获取单个作品的评论，参数为作品链接
-def fetch_video_comments(url):
-    aweme_id = get_aweme_id(url);
+def fetch_video_comments(log_text, url):
+    aweme_id = get_aweme_id(log_text, url);
     if(aweme_id):
-        video_data = fetch_one_video(url);
+        video_data = fetch_one_video(log_text, url);
         statistics = video_data['data']['aweme_detail']['statistics'] # 统计信息，点赞评论转发数量等
         digg_count = statistics['digg_count'] # 点赞
         share_count = statistics['share_count'] # 分享
@@ -78,9 +80,10 @@ def fetch_video_comments(url):
         page_size = 20
         # 总页数
         total_pages = (comment_count + page_size - 1) // page_size  # 向上取整计算总页数
-        print(f"要查询的总页数: {total_pages}")
+        # print(f"要查询的总页数: {total_pages}")
+        log_text.append_log(f"要查询的总页数: {total_pages}")
         while current_page <= total_pages:
-            print(f"要查询的总页数: {total_pages}, 当前第{current_page}页")
+            log_text.append_log(f"要查询的总页数: {total_pages}, 当前第{current_page}页")
             # Query parameters
             params = {
                 "aweme_id": aweme_id,  # 替换为实际的视频ID
@@ -99,13 +102,13 @@ def fetch_video_comments(url):
                 all_comments.append(data)
                 # return data
             else:
-                print(f"请求失败，状态码: {response.status_code}")
-                print(response.text)
+                log_text.append_log(f"请求失败，状态码: {response.status_code}")
+                # print(response.text)
                 return None
             current_page += 1
         return all_comments;
     else:
-        print("获取作品ID失败")
+        log_text.append_log("获取作品ID失败")
         return None
     
 
@@ -157,3 +160,25 @@ def update_comments_table(table, comments_data):
             for col in range(num_cols):
                 item = QTableWidgetItem(str(comments_table_data[row][col]))
                 table.setItem(row, col, item)
+                
+                
+                
+def export_table_to_csv(self,log_text, table_widget):
+    path, _ = QFileDialog.getSaveFileName(self, "Save CSV", "", "CSV Files (*.csv);;All Files (*)")
+    if path:
+        try:
+            with open(path, 'w', newline='', encoding='utf-8-sig') as file:
+                writer = csv.writer(file)
+                # Write headers
+                headers = [table_widget.horizontalHeaderItem(i).text() for i in range(table_widget.columnCount())]
+                writer.writerow(headers)
+                # Write data
+                for row in range(table_widget.rowCount()):
+                    row_data = []
+                    for column in range(table_widget.columnCount()):
+                        item = table_widget.item(row, column)
+                        row_data.append(item.text() if item else "")
+                    writer.writerow(row_data)
+            QMessageBox.information(self, "成功", "表格数据已成功导出为CSV文件.")
+        except Exception as e:
+            QMessageBox.critical(self, "错误", f"导出CSV文件时发生错误: {str(e)}")                
