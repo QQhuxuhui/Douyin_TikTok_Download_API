@@ -5,7 +5,7 @@ a = Analysis(
     ['gui\\main.py'],
     pathex=[],
     binaries=[],
-    datas=[('F:\\workspace\\github\\QQhuxuhui\\Douyin_TikTok_Download_API\\config.yaml', '.'), ('F:\\workspace\\github\\QQhuxuhui\\Douyin_TikTok_Download_API\\crawlers\\douyin\\web\\config.yaml', 'crawlers\\douyin\\web')],
+    datas=[('config.yaml', '.'), ('crawlers\\douyin\\web\\config.yaml', 'crawlers\\douyin\\web')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

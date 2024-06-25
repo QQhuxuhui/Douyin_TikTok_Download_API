@@ -18,7 +18,8 @@ class Worker(QRunnable):
             self.log_text.append_log(f"开始采集作品评论数据，账号链接为: {self.account_link}")
             data = service.fetch_video_comments(self.log_text, self.account_link)
             # Emit a signal to indicate the task is finished
-            self.signals.finished.emit(data)
+            self.signals.result.emit(data)
+            self.signals.finished.emit()  
         except Exception as e:
             # Emit an error signal if an exception occurs
             self.signals.error.emit(str(e))

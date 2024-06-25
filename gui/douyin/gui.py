@@ -26,8 +26,8 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("PyQt Layout Example")
-        self.setGeometry(100, 100, 1200, 800)
+        self.setWindowTitle("抖音数据")
+        self.setGeometry(100, 100, 1500, 1000)
 
         # Main widget
         main_widget = QWidget()
@@ -46,7 +46,7 @@ class MainWindow(QMainWindow):
         web_layout = QVBoxLayout(web_frame)
         self.web_view = QWebEngineView()
         web_layout.addWidget(self.web_view)
-        self.web_view.setUrl(QUrl("https://www.douyin.com/"))
+        self.web_view.setUrl(QUrl("https://www.douyin.com/discover"))
 
         # Input and buttons layout
         input_buttons_widget = QWidget()
@@ -211,7 +211,7 @@ class MainWindow(QMainWindow):
         service.update_comments_table(self.table1, data)
 
     def on_worker_finished(self):
-        QMessageBox.information(self, "评论数据采集完成")
+        QMessageBox.information(self, "提示", "评论数据采集完成")
 
     def on_worker_error(self, error_message):
         QMessageBox.critical(self, "错误", f"采集作品评论数据时发生错误: {error_message}")
