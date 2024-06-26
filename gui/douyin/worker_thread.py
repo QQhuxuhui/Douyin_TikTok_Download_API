@@ -1,10 +1,12 @@
 from PyQt5.QtCore import QObject, pyqtSignal, QRunnable
-import douyin.service as service
+import asyncio
+import gui.douyin.service as service
+import json
 
 class WorkerSignals(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(str)
-    result = pyqtSignal(object)  # Signal with a data object
+    result = pyqtSignal(str)  # Signal with a string object
 
 class Worker(QRunnable):
     def __init__(self, account_link, log_text):
@@ -14,12 +16,18 @@ class Worker(QRunnable):
         self.log_text = log_text
 
     def run(self):
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         try:
             self.log_text.append_log(f"开始采集作品评论数据，账号链接为: {self.account_link}")
-            data = service.fetch_video_comments(self.log_text, self.account_link)
-            # Emit a signal to indicate the task is finished
-            self.signals.result.emit(data)
-            self.signals.finished.emit()  
+            coroutine = service.fetch_video_comments(self.log_text, self.account_link)
+            loop.run_until_complete(self.fetch_all_comments(coroutine))
+            self.signals.finished.emit()
         except Exception as e:
-            # Emit an error signal if an exception occurs
             self.signals.error.emit(str(e))
+        finally:
+            loop.close()
+
+    async def fetch_all_comments(self, coroutine):
+        async for data in coroutine:
+            self.signals.result.emit(data)

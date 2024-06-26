@@ -4,8 +4,8 @@ from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineProfile
 from PyQt5.QtCore import QUrl, Qt,QThreadPool
 from PyQt5.QtWebEngineCore import QWebEngineCookieStore
 
-import douyin.service as service
-from douyin.worker_thread import Worker, WorkerSignals
+import gui.douyin.service as service
+from gui.douyin.worker_thread import Worker, WorkerSignals
 
 class InputDialog(QInputDialog):
     def __init__(self, title, label_text, parent=None):
@@ -52,9 +52,6 @@ class MainWindow(QMainWindow):
         input_buttons_widget = QWidget()
         input_buttons_layout = QVBoxLayout(input_buttons_widget)
 
-        # self.get_cookies_button = QPushButton("更新登录信息（扫码登录成功后点击）")
-        # self.get_cookies_button.clicked.connect(self.get_cookies)
-        # input_buttons_layout.addWidget(self.get_cookies_button)
         divider = QLabel("\n已开放功能区域\n")
         divider.setAlignment(Qt.AlignCenter)
         divider.setStyleSheet("font-size: 14px; font-weight: bold;")
@@ -188,7 +185,7 @@ class MainWindow(QMainWindow):
             QMessageBox.critical(self, "错误", f"批量下载链接作品时发生错误: {str(e)}")
 
     def show_collect_comments_dialog(self):
-        try:
+        # try:
             dialog = InputDialog("采集作品评论数据", "请输入账号链接:", self)
             if dialog.exec_():
                 account_link = dialog.textValue()
@@ -203,11 +200,10 @@ class MainWindow(QMainWindow):
                 
                 # Execute the worker in the thread pool
                 QThreadPool.globalInstance().start(worker)
-        except Exception as e:
-            QMessageBox.critical(self, "错误", f"采集作品评论数据时发生错误: {str(e)}")
+        # except Exception as e:
+        #     QMessageBox.critical(self, "错误", f"采集作品评论数据时发生错误: {str(e)}")
 
     def on_worker_result(self, data):
-        # Handle the received data here
         service.update_comments_table(self.table1, data)
 
     def on_worker_finished(self):

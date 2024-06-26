@@ -39,9 +39,9 @@ def main():
     if available_port is None:
         raise Exception("No available port found between 80 and 65535")
 
-    print(f"Found available port: {available_port}")
+    # print(f"Found available port: {available_port}")
     update_config_port(available_port, config_path)
-    print(f"Updated {config_path} with port {available_port}")
+    # print(f"Updated {config_path} with port {available_port}")
  
 # 获取抖音配置文件
 def get_douyun_config_path():
