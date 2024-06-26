@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['main_gui.py'],
+    ['gui_douyin.py'],
     pathex=[],
     binaries=[],
     datas=[('config.yaml', '.'), ('crawlers\\douyin\\web\\config.yaml', 'crawlers\\douyin\\web')],
