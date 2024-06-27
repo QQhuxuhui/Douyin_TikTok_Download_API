@@ -9,12 +9,12 @@ def is_port_available(port):
 
 def update_config_port(new_port, config_path):
     yaml = YAML()
-    with open(config_path, 'r') as file:
+    with open(config_path, 'r', encoding='utf-8') as file:
         config = yaml.load(file)
     
     config['API']['Host_Port'] = new_port
 
-    with open(config_path, 'w') as file:
+    with open(config_path, 'w', encoding='utf-8') as file:
         yaml.dump(config, file)
 
 def find_available_port(start_port=80, end_port=65535):
@@ -39,9 +39,9 @@ def main():
     if available_port is None:
         raise Exception("No available port found between 80 and 65535")
 
-    print(f"Found available port: {available_port}")
+    # print(f"Found available port: {available_port}")
     update_config_port(available_port, config_path)
-    print(f"Updated {config_path} with port {available_port}")
+    # print(f"Updated {config_path} with port {available_port}")
  
 # 获取抖音配置文件
 def get_douyun_config_path():
@@ -52,15 +52,14 @@ def get_douyun_config_path():
 
 # 更新抖音cookie
 def update_config_cookie(cookie):  
-    print(cookie)
     config_path = get_douyun_config_path()
     yaml = YAML()
-    with open(config_path, 'r') as file:
+    with open(config_path, 'r', encoding='utf-8') as file:
         config = yaml.load(file)
     
     config['TokenManager']['douyin']['headers']['Cookie'] = cookie
 
-    with open(config_path, 'w') as file:
+    with open(config_path, 'w', encoding='utf-8') as file:
         yaml.dump(config, file)
 
 # 获取web地址
