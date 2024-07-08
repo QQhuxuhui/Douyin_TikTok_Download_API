@@ -84,29 +84,29 @@ class MainWindow(QMainWindow):
         self.button4 = QPushButton("获取用户收藏作品")
         self.button4.clicked.connect(self.no_function)
 
-        # Button 5: 获取用户合辑作品
-        self.button5 = QPushButton("获取用户合辑作品")
-        self.button5.clicked.connect(self.no_function)
+        # # Button 5: 获取用户合辑作品
+        # self.button5 = QPushButton("获取用户合辑作品")
+        # self.button5.clicked.connect(self.no_function)
 
-        # Button 6: 获取用户直播流数据
-        self.button6 = QPushButton("获取用户直播流数据")
-        self.button6.clicked.connect(self.no_function)
+        # # Button 6: 获取用户直播流数据
+        # self.button6 = QPushButton("获取用户直播流数据")
+        # self.button6.clicked.connect(self.no_function)
 
-        # Button 6: 获取直播间送礼用户排行榜
-        self.button7 = QPushButton("获取直播间送礼用户排行榜")
-        self.button7.clicked.connect(self.no_function)
+        # # Button 6: 获取直播间送礼用户排行榜
+        # self.button7 = QPushButton("获取直播间送礼用户排行榜")
+        # self.button7.clicked.connect(self.no_function)
 
-        self.button8 = QPushButton("获取直播间商品信息")
-        self.button8.clicked.connect(self.no_function)
+        # self.button8 = QPushButton("获取直播间商品信息")
+        # self.button8.clicked.connect(self.no_function)
 
         input_buttons_layout.addWidget(self.button1)
         input_buttons_layout.addWidget(self.button2)
         input_buttons_layout.addWidget(self.button3)
-        input_buttons_layout.addWidget(self.button4)
-        input_buttons_layout.addWidget(self.button5)
-        input_buttons_layout.addWidget(self.button6)
-        input_buttons_layout.addWidget(self.button7)
-        input_buttons_layout.addWidget(self.button8)
+        # input_buttons_layout.addWidget(self.button4)
+        # input_buttons_layout.addWidget(self.button5)
+        # input_buttons_layout.addWidget(self.button6)
+        # input_buttons_layout.addWidget(self.button7)
+        # input_buttons_layout.addWidget(self.button8)
 
         # Adding to left layout
         left_layout.addWidget(web_frame, 7)
@@ -212,15 +212,6 @@ class MainWindow(QMainWindow):
     def on_worker_error(self, error_message):
         QMessageBox.critical(self, "错误", f"采集作品评论数据时发生错误: {error_message}")
 
-    def show_collect_search_results_dialog(self):
-        try:
-            dialog = InputDialog("采集搜索结果数据", "请输入筛选条件:", self)
-            if dialog.exec_():
-                search_criteria = dialog.textValue()
-                self.log_text.append_log(f"开始采集搜索结果数据，筛选条件为: {search_criteria}")
-        except Exception as e:
-            QMessageBox.critical(self, "错误", f"采集搜索结果数据时发生错误: {str(e)}")
-
     def no_function(self):
         try:
             QMessageBox.information(self, "采集抖音热榜数据", "尚未开放")
@@ -236,6 +227,15 @@ class MainWindow(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self, "错误", f"批量下载收藏作品时发生错误: {str(e)}")
 
+    def show_download_file_batch_dialog(self):
+        try:
+            dialog = InputDialog("批量下载收藏作品", "请输入账号链接:", self)
+            if dialog.exec_():
+                account_link = dialog.textValue()
+                self.log_text.append_log(f"开始批量下载收藏作品")
+        except Exception as e:
+            QMessageBox.critical(self, "错误", f"批量下载收藏作品时发生错误: {str(e)}")
+            
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     main_window = MainWindow()
