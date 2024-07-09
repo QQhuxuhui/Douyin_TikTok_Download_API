@@ -84,29 +84,10 @@ class MainWindow(QMainWindow):
         self.button4 = QPushButton("获取用户收藏作品")
         self.button4.clicked.connect(self.no_function)
 
-        # # Button 5: 获取用户合辑作品
-        # self.button5 = QPushButton("获取用户合辑作品")
-        # self.button5.clicked.connect(self.no_function)
-
-        # # Button 6: 获取用户直播流数据
-        # self.button6 = QPushButton("获取用户直播流数据")
-        # self.button6.clicked.connect(self.no_function)
-
-        # # Button 6: 获取直播间送礼用户排行榜
-        # self.button7 = QPushButton("获取直播间送礼用户排行榜")
-        # self.button7.clicked.connect(self.no_function)
-
-        # self.button8 = QPushButton("获取直播间商品信息")
-        # self.button8.clicked.connect(self.no_function)
-
         input_buttons_layout.addWidget(self.button1)
         input_buttons_layout.addWidget(self.button2)
         input_buttons_layout.addWidget(self.button3)
-        # input_buttons_layout.addWidget(self.button4)
-        # input_buttons_layout.addWidget(self.button5)
-        # input_buttons_layout.addWidget(self.button6)
-        # input_buttons_layout.addWidget(self.button7)
-        # input_buttons_layout.addWidget(self.button8)
+
 
         # Adding to left layout
         left_layout.addWidget(web_frame, 7)
@@ -176,41 +157,44 @@ class MainWindow(QMainWindow):
 
     def show_bulk_download_dialog(self):
         try:
-            dialog = InputDialog("批量下载链接作品", "请输入链接作品内容:", self)
-            dialog.setTextValue("多行文本\n内容")
-            if dialog.exec_():
-                bulk_content = dialog.textValue()
-                self.log_text.append_log(f"开始批量下载链接作品，内容为:\n{bulk_content}")
-        except Exception as e:
-            QMessageBox.critical(self, "错误", f"批量下载链接作品时发生错误: {str(e)}")
-
-    def show_collect_comments_dialog(self):
-        # try:
             dialog = InputDialog("采集作品评论数据", "请输入账号链接:", self)
             if dialog.exec_():
                 account_link = dialog.textValue()
-
                 # Create a worker instance
-                worker = Worker(account_link, self.log_text)
-                
+                worker = Worker(service.download_file_batch, account_link, self.log_text)
                 # Connect signals from the worker
                 worker.signals.result.connect(self.on_worker_result)
                 worker.signals.finished.connect(self.on_worker_finished)
                 worker.signals.error.connect(self.on_worker_error)
-                
                 # Execute the worker in the thread pool
                 QThreadPool.globalInstance().start(worker)
-        # except Exception as e:
-        #     QMessageBox.critical(self, "错误", f"采集作品评论数据时发生错误: {str(e)}")
+        except Exception as e:
+            QMessageBox.critical(self, "错误", f"采集作品评论数据时发生错误: {str(e)}")            
+
+    def show_collect_comments_dialog(self):
+        try:
+            dialog = InputDialog("采集作品评论数据", "请输入账号链接:", self)
+            if dialog.exec_():
+                account_link = dialog.textValue()
+                # Create a worker instance
+                worker = Worker(service.fetch_video_comments, account_link, self.log_text)
+                # Connect signals from the worker
+                worker.signals.result.connect(self.on_worker_result)
+                worker.signals.finished.connect(self.on_worker_finished)
+                worker.signals.error.connect(self.on_worker_error)
+                # Execute the worker in the thread pool
+                QThreadPool.globalInstance().start(worker)
+        except Exception as e:
+            QMessageBox.critical(self, "错误", f"采集作品评论数据时发生错误: {str(e)}")
 
     def on_worker_result(self, data):
         service.update_comments_table(self.table1, data)
-
+        
     def on_worker_finished(self):
-        QMessageBox.information(self, "提示", "评论数据采集完成")
+        QMessageBox.information(self, "提示", "处理完成")
 
     def on_worker_error(self, error_message):
-        QMessageBox.critical(self, "错误", f"采集作品评论数据时发生错误: {error_message}")
+        QMessageBox.critical(self, "错误", f"发生错误: {error_message}")
 
     def no_function(self):
         try:
