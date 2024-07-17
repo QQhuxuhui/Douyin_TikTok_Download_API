@@ -63,10 +63,10 @@ class MainWindow(QMainWindow):
         input_buttons_layout.addWidget(self.open_button)
 
         # Divider line
-        divider = QLabel("\n未开放功能区域\n")
-        divider.setAlignment(Qt.AlignCenter)
-        divider.setStyleSheet("font-size: 14px; font-weight: bold;")
-        input_buttons_layout.addWidget(divider)
+        # divider = QLabel("\n未开放功能区域\n")
+        # divider.setAlignment(Qt.AlignCenter)
+        # divider.setStyleSheet("font-size: 14px; font-weight: bold;")
+        # input_buttons_layout.addWidget(divider)
 
         # Button 1: 批量下载账号作品
         self.button1 = QPushButton("批量下载账号作品")
@@ -74,7 +74,7 @@ class MainWindow(QMainWindow):
 
         # Button 2: 批量下载链接作品
         self.button2 = QPushButton("批量下载链接作品")
-        self.button2.clicked.connect(self.no_function)
+        self.button2.clicked.connect(self.show_download_file_batch_dialog)
 
         # Button 3: 采集作品评论数据
         self.button3 = QPushButton("获取用户喜欢作品")
@@ -182,13 +182,15 @@ class MainWindow(QMainWindow):
                 worker.signals.result.connect(self.on_worker_result)
                 worker.signals.finished.connect(self.on_worker_finished)
                 worker.signals.error.connect(self.on_worker_error)
-                # Execute the worker in the thread pool
                 QThreadPool.globalInstance().start(worker)
         except Exception as e:
             QMessageBox.critical(self, "错误", f"采集作品评论数据时发生错误: {str(e)}")
 
     def on_worker_result(self, data):
         service.update_comments_table(self.table1, data)
+        
+    def on_download_video_result(self, data):
+        print(data)
         
     def on_worker_finished(self):
         QMessageBox.information(self, "提示", "处理完成")
@@ -216,7 +218,12 @@ class MainWindow(QMainWindow):
             dialog = InputDialog("批量下载收藏作品", "请输入账号链接:", self)
             if dialog.exec_():
                 account_link = dialog.textValue()
-                self.log_text.append_log(f"开始批量下载收藏作品")
+                worker = Worker(service.download_file_batch, account_link, self.log_text)
+                # Connect signals from the worker
+                worker.signals.result.connect(self.on_download_video_result)
+                worker.signals.finished.connect(self.on_worker_finished)
+                worker.signals.error.connect(self.on_worker_error)
+                QThreadPool.globalInstance().start(worker)                
         except Exception as e:
             QMessageBox.critical(self, "错误", f"批量下载收藏作品时发生错误: {str(e)}")
             

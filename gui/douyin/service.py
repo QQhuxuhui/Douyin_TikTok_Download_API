@@ -87,17 +87,20 @@ async def download_file_batch(log_text, input_data):
     failed_list = []
     # 遍历链接列表
     for url in url_lists:
+        
         # 链接编号
         url_index = url_lists.index(url) + 1
+        log_text.append_log(f"共计需要下载：{url_lists.index(url)}个，当前第{url_index}个，地址：{url}")
         # 解析
         try:
-            download_file_one(url)
+            await download_file_one(log_text, url)
         except Exception as e:
             error_msg = str(e)
             log_text.append_log(f"视频下载失败: {url}, 当前第{url_index}个，失败原因：{error_msg}")
             failed_count += 1
             failed_list.append(url)
             continue
+        yield url_index
         
         
 async def fetch_data(url: str, headers: dict = None):
@@ -110,7 +113,6 @@ async def fetch_data(url: str, headers: dict = None):
         return response
         
 async def download_file_one(log_text, url):
-
     # 开始解析数据/Start parsing data
     try:
         data = await HybridCrawler.hybrid_parsing_single_video(url, minimal=True)
@@ -118,14 +120,13 @@ async def download_file_one(log_text, url):
         code = 400
         log_text.append_log(f"视频下载失败: {url}，失败原因：{str(e)}")
         return;
-
     # 开始下载文件/Start downloading files
     try:
         data_type = data.get('type')
         platform = data.get('platform')
         aweme_id = data.get('aweme_id')
-        file_prefix = config.get("API").get("Download_File_Prefix")
-        download_path = os.path.join(config.get("API").get("Download_Path"), f"{platform}_{data_type}")
+        file_prefix = config.get_file_download_prefix()
+        download_path = os.path.join(config.get_file_download_path(), f"{platform}_{data_type}")
 
         # 确保目录存在/Ensure the directory exists
         os.makedirs(download_path, exist_ok=True)
@@ -135,6 +136,7 @@ async def download_file_one(log_text, url):
             file_name = f"{file_prefix}{platform}_{aweme_id}.mp4"
             url = data.get('video_data').get('nwm_video_url_HQ') 
             file_path = os.path.join(download_path, file_name)
+            log_text.append_log(file_path)
 
 
             # 获取视频文件

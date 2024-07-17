@@ -74,6 +74,15 @@ def get_web_port():
         config = yaml.safe_load(file)
     return config.get('API', {}).get('Host_Port', None)
 
+def get_file_download_path():
+    with open(get_config_path(), 'r', encoding='utf-8') as file:
+        config = yaml.safe_load(file)
+    return config.get("API").get("Download_Path", None)
+
+def get_file_download_prefix():
+    with open(get_config_path(), 'r', encoding='utf-8') as file:
+        config = yaml.safe_load(file)
+    return config.get("API").get("Download_File_Prefix", None)
     
 if __name__ == "__main__":
     main()

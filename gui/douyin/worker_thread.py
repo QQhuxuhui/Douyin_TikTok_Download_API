@@ -21,17 +21,17 @@ class Worker(QRunnable):
     def run(self):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        try:
-            self.log_text.append_log(f"开始处理链接: {self.account_link}")
-            coroutine = service.coroutine_func(self.log_text, self.account_link)
-            loop.run_until_complete(self.fetch_all_comments(coroutine))
-            self.signals.finished.emit()
-        except Exception as e:
-            self.signals.error.emit(str(e))
-        finally:
-            loop.close()
+        # try:
+        self.log_text.append_log(f"开始处理链接: {self.account_link}")
+        coroutine = self.coroutine_func(self.log_text, self.account_link)
+        loop.run_until_complete(self.complete(coroutine))
+        self.signals.finished.emit()
+        # except Exception as e:
+        #     self.signals.error.emit(str(e))
+        # finally:
+        #     loop.close()
 
-    async def fetch_all_comments(self, coroutine):
+    async def complete(self, coroutine):
         async for data in coroutine:
             # 根据数据类型发送对应的结果信号
             if isinstance(data, str):
